@@ -35,44 +35,19 @@ class CardGetter:
 
         if self.check_field(result, 'card_faces'):
             formatted = {
-                'image_uri': result['card_faces'][0]['image_uris']['normal'],
+                'image_uris': [
+                    result['card_faces'][0]['image_uris']['normal'],
+                    result['card_faces'][1]['image_uris']['normal']
+                ]
             }
         else:
             formatted = {
-                # 'card_name': result['name'],
-                # 'type_line': result['type_line'],            
-                # 'keywords': result['keywords'],
-                # 'rarity': result['rarity'],
-                # 'prices': result['prices'],
-                'image_uri': result['image_uris']['normal'],
+                'image_uris': [
+                    result['image_uris']['normal']
+                ],
             }
         
         formatted.update({'prices': result['prices']})
-
-        # Only need to check once since if a card doesn't have power
-        # it won't have toughness
-        # if self.check_field(result, 'power'):
-        #     formatted.update({
-        #         'power':     result['power'],
-        #         'toughness': result['toughness']
-        #     })
-
-        # Lands don't have mana costs
-        # if self.check_field(result, 'mana_cost'):
-        #     formatted.update({
-        #         'mana_cost': result['mana_cost']
-        #     })
-
-        # Basic lands might not have oracle text?
-        # if self.check_field(result, 'oracle_text'):
-        #     formatted.update({
-        #         'description': result['oracle_text']
-        #     })
-
-        # if self.check_field(result, 'flavor_text'):
-        #     formatted.update({
-        #         'flavor_text': result['flavor_text']
-        #     })
 
         return formatted
     
@@ -127,7 +102,7 @@ class PageView:
             if submitted:
                 getter = CardGetter()
                 searched_card = getter.search_card(card_to_search)
-                image_uri = searched_card['image_uri']
+                image_uri = searched_card['image_uris']
                 prices = searched_card['prices']
                 self.render_image(image_uri)
                 self.render_price(prices)
@@ -139,7 +114,7 @@ class PageView:
             if submitted:
                 getter = CardGetter()
                 random_card = getter.get_random_card()
-                image_uri = random_card['image_uri']
+                image_uri = random_card['image_uris']
                 prices = random_card['prices']
                 self.render_image(image_uri)
                 self.render_price(prices)
