@@ -23,9 +23,13 @@ class CardGetter:
     def get_random_card(self):
         url = self.build_url('random')
         result = self.query_api(url)
-        card = self.format_result(result)
-
-        return card
+        if result['object'] != 'card':
+            page = PageView()
+            page.render_error(result)
+            return 
+        else:
+            card = self.format_result(result)
+            return card
     
     def get_card_image(self, result, size='normal'):
         return result['image_uris'][size]
@@ -65,8 +69,9 @@ class CardGetter:
         result = self.query_api(url)
         # st.write(result)  # for debug
         if result['object'] != 'card':
-            st.error(result)
-            st.stop()
+            page = PageView()
+            page.render_error(result)
+            return 
         else:
             formatted = self.format_result(result)
             return formatted
@@ -82,6 +87,9 @@ class PageView:
             self.random_card()
             if image is not None:
                 self.render_image(image)
+    
+    def render_error(self, result):
+        st.write(result['details'])
 
     def render_image(self, image_uri):
         st.image(image_uri)
@@ -102,10 +110,11 @@ class PageView:
             if submitted:
                 getter = CardGetter()
                 searched_card = getter.search_card(card_to_search)
-                image_uri = searched_card['image_uris']
-                prices = searched_card['prices']
-                self.render_image(image_uri)
-                self.render_price(prices)
+                if searched_card is not None:
+                    image_uri = searched_card['image_uris']
+                    prices = searched_card['prices']
+                    self.render_image(image_uri)
+                    self.render_price(prices)
     
     def random_card(self):
         with st.form('get_random_card'):
@@ -114,10 +123,11 @@ class PageView:
             if submitted:
                 getter = CardGetter()
                 random_card = getter.get_random_card()
-                image_uri = random_card['image_uris']
-                prices = random_card['prices']
-                self.render_image(image_uri)
-                self.render_price(prices)
+                if random_card is not None:
+                    image_uri = random_card['image_uris']
+                    prices = random_card['prices']
+                    self.render_image(image_uri)
+                    self.render_price(prices)
     
     def _json_to_table(self, data):
         return pd.DataFrame.from_dict(
