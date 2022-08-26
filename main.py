@@ -30,43 +30,49 @@ class CardGetter:
     def get_card_image(self, result, size='normal'):
         return result['image_uris'][size]
 
-
+    # TODO: Handle fields nested under "card_faces"
     def format_result(self, result):
 
-        formatted = {
-            'card_name': result['name'],
-            'mana_cost': result['mana_cost'],
-            'type_line': result['type_line'],            
-            'keywords': result['keywords'],
-            'rarity': result['rarity'],
-            'prices': result['prices'],
-            'image_uri': result['image_uris']['normal'],
-        }
+        if self.check_field(result, 'card_faces'):
+            formatted = {
+                'image_uri': result['card_faces'][0]['image_uris']['normal'],
+            }
+        else:
+            formatted = {
+                # 'card_name': result['name'],
+                # 'type_line': result['type_line'],            
+                # 'keywords': result['keywords'],
+                # 'rarity': result['rarity'],
+                # 'prices': result['prices'],
+                'image_uri': result['image_uris']['normal'],
+            }
+        
+        formatted.update({'prices': result['prices']})
 
         # Only need to check once since if a card doesn't have power
         # it won't have toughness
-        if self.check_field(result, 'power'):
-            formatted.update({
-                'power':     result['power'],
-                'toughness': result['toughness']
-            })
+        # if self.check_field(result, 'power'):
+        #     formatted.update({
+        #         'power':     result['power'],
+        #         'toughness': result['toughness']
+        #     })
 
         # Lands don't have mana costs
-        if self.check_field(result, 'mana_cost'):
-            formatted.update({
-                'mana_cost': result['mana_cost']
-            })
+        # if self.check_field(result, 'mana_cost'):
+        #     formatted.update({
+        #         'mana_cost': result['mana_cost']
+        #     })
 
         # Basic lands might not have oracle text?
-        if self.check_field(result, 'oracle_text'):
-            formatted.update({
-                'description': result['oracle_text']
-            })
+        # if self.check_field(result, 'oracle_text'):
+        #     formatted.update({
+        #         'description': result['oracle_text']
+        #     })
 
-        if self.check_field(result, 'flavor_text'):
-            formatted.update({
-                'flavor_text': result['flavor_text']
-            })
+        # if self.check_field(result, 'flavor_text'):
+        #     formatted.update({
+        #         'flavor_text': result['flavor_text']
+        #     })
 
         return formatted
     
