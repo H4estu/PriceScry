@@ -25,7 +25,3 @@ class TestSearches:
         result = self.getter.search_card(unknown_card)
         assert (result['object'], result['status']) == ('error', 404)
 
-
-# Both sides of dual-face cards are rendered
-
-
