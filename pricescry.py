@@ -23,13 +23,8 @@ class CardGetter:
     def get_random_card(self):
         url = self.build_url('random')
         result = self.query_api(url)
-        if result['object'] != 'card':
-            page = PageView()
-            page.render_error(result)
-            return 
-        else:
-            card = self.format_result(result)
-            return card
+
+        return result
     
     def get_card_image(self, result, size='normal'):
         return result['image_uris'][size]
@@ -68,6 +63,9 @@ class CardGetter:
         url = self.build_url(f'named/?fuzzy={card_to_search}')
         result = self.query_api(url)
         # st.write(result)  # for debug
+        return result
+
+    def handle_result(self, result):
         if result['object'] != 'card':
             page = PageView()
             page.render_error(result)
@@ -75,6 +73,7 @@ class CardGetter:
         else:
             formatted = self.format_result(result)
             return formatted
+
 
 
 
@@ -109,7 +108,7 @@ class PageView:
             submitted = st.form_submit_button('Search')
             if submitted:
                 getter = CardGetter()
-                searched_card = getter.search_card(card_to_search)
+                searched_card = getter.handle_result(getter.search_card(card_to_search))
                 if searched_card is not None:
                     image_uri = searched_card['image_uris']
                     prices = searched_card['prices']
@@ -122,7 +121,7 @@ class PageView:
             submitted = st.form_submit_button('Random')
             if submitted:
                 getter = CardGetter()
-                random_card = getter.get_random_card()
+                random_card = getter.handle_result(getter.get_random_card())
                 if random_card is not None:
                     image_uri = random_card['image_uris']
                     prices = random_card['prices']
